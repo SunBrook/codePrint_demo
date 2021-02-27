@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>打印 - 二维码</title>
+</head>
+<style type="text/css">
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+    p {
+        margin: 7px 0 0 20px;
+    }
+
+    p label {
+        font-size: 9px;
+    }
+
+    .startSpace, .endSpace, .checkType, .code, .addTime {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    #printDetailDiv {
+    }
+
+    #printDetailDiv .modelDiv {
+        /*width: 250px;*/
+        /*height: 250px;*/
+        /*border: 1px solid #000000;*/
+    }
+
+    svg {
+        position: relative;
+        left: 10px;
+    }
+
+    .qr_div {
+        margin-left: 75px;
+        margin-top: 20px;
+        width: 100px;
+        height: 100px;
+    }
+
+</style>
+<body>
+<!-- 打印明细窗口 -->
+<div>
+    <div id="printDetailDiv">
+        <p>
+            <label>起点：</label>
+            <span class="startSpace"></span>
+        </p>
+        <p>
+            <label>终点：</label>
+            <span class="endSpace"></span>
+        </p>
+        <p>
+            <label>类型：</label>
+            <span class="checkType"></span>
+        </p>
+
+    </div>
+</div>
+</body>
+
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/qrcode.min.js"></script>
+<script>
+    //当前热敏纸尺寸 60 * 70
+    var checkMsg = [{
+        startSpace: "上海",
+        endSpace: "广州",
+        checkType: "机票",
+        code: "15790025100",
+        addTime: "2021/01/08 12:05:17"
+    },
+        {
+            startSpace: "北京",
+            endSpace: "深圳",
+            checkType: "高铁票",
+            code: "20790025101",
+            addTime: "2021/01/08 12:05:17"
+        },
+        // {
+        //     startSpace: "广州",
+        //     endSpace: "深圳",
+        //     checkType: "高铁票",
+        //     code: "20790025102",
+        //     addTime: "2021/01/08 12:05:17"
+        // },
+    ]
+
+    creatTB(checkMsg);
+
+    setTimeout(function () {
+        window.print();
+        // location.reload();
+    }, 500);
+
+    function creatTB(checkMsg) {
+
+        //布局页面
+        let detailHtml = "";
+        for (let i = 0; i < checkMsg.length; i++) {
+            let detailStart = '<div class="modelDiv"><div>';
+            detailStart += '<p><label>起点：</label><span class="startSpace">' + checkMsg[i].startSpace + '</span></p>';
+            detailStart += '<p><label>终点：</label><span class="endSpace">' + checkMsg[i].endSpace + '</span></p>';
+            detailStart += '<p><label>类型：</label><span class="checkType">' + checkMsg[i].checkType + '</span></p>';
+            detailStart += '<p><label>条码：</label><span class="code">' + checkMsg[i].code + '</span></p>';
+            detailStart += '<p><label>时间：</label><span class="addTime">' + checkMsg[i].addTime + '</span></p>';
+            detailStart += '<div id="qrcode_' + checkMsg[i].code + '" class="qr_div"></div>';
+            const detailEnd = '</div><div style="page-break-after:always"></div></div>';
+            detailHtml += detailStart + detailEnd;
+        }
+        $("#printDetailDiv").html(detailHtml);
+
+        //更新二维码
+        for (let i = 0; i < checkMsg.length; i++) {
+            new QRCode(document.getElementById("qrcode_" + checkMsg[i].code), {
+                text: checkMsg[i].code,
+                width: 100,
+                height: 100,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+    }
+</script>
+</html>

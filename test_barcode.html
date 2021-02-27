@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>打印 - 条形码</title>
+</head>
+<style type="text/css">
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+    p {
+        margin: 7px 0 0 20px;
+    }
+
+    p label {
+        font-size: 9px !important;
+    }
+
+    .startSpace, .endSpace, .checkType, .code, .addTime {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    #printDetailDiv {
+        width: 271px;
+        height: auto;
+    }
+
+    #printDetailDiv .modelDiv {
+        width: 100%;
+        height: 299px;
+        border: 1px solid #ffffff;
+    }
+
+    svg {
+        position: relative;
+        left: 10px;
+    }
+
+</style>
+<body>
+<!-- 打印明细窗口 -->
+<div>
+    <div id="printDetailDiv">
+        <p>
+            <label>起点：</label>
+            <span class="startSpace"></span>
+        </p>
+        <p>
+            <label>终点：</label>
+            <span class="endSpace"></span>
+        </p>
+        <p>
+            <label>类型：</label>
+            <span class="checkType"></span>
+        </p>
+
+    </div>
+</div>
+</body>
+
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/JsBarcode.all.min.js"></script>
+<script>
+    //当前热敏纸尺寸 60 * 70
+    var checkMsg = [{
+        startSpace: "上海",
+        endSpace: "广州",
+        checkType: "机票",
+        code: "121012321824",
+        addTime: "2021/01/08 12:05:17"
+    },
+        // {
+        //     startSpace: "北京",
+        //     endSpace: "深圳",
+        //     checkType: "高铁票",
+        //     code: "1579002510023456790",
+        //     addTime: "2021/01/08 12:05:17"
+        // },
+    ]
+
+    creatTB(checkMsg);
+
+    setTimeout(function () {
+        window.print();
+        location.reload();
+    }, 500);
+
+    function creatTB(checkMsg) {
+
+        //布局页面
+        let detailHtml = "";
+        for (let i = 0; i < checkMsg.length; i++) {
+            let detailStart = '<div class="modelDiv"><div>';
+            detailStart += '<p><label>起点：</label><span class="startSpace">' + checkMsg[i].startSpace + '</span></p>';
+            detailStart += '<p><label>终点：</label><span class="endSpace">' + checkMsg[i].endSpace + '</span></p>';
+            detailStart += '<p><label>类型：</label><span class="checkType">' + checkMsg[i].checkType + '</span></p>';
+            detailStart += '<p><label>条码：</label><span class="code">' + checkMsg[i].code + '</span></p>';
+            detailStart += '<p><label>时间：</label><span class="addTime">' + checkMsg[i].addTime + '</span></p>';
+            detailStart += '<svg id="barcode_' + checkMsg[i].code + '"></svg>';
+            const detailEnd = '</div><div style="page-break-after:always"></div></div>';
+            detailHtml += detailStart + detailEnd;
+        }
+        $("#printDetailDiv").html(detailHtml);
+
+        //更新条形码
+        //例子：https://codepen.io/lindell/pen/eZKBdO?editors=1010
+        for (let i = 0; i < checkMsg.length; i++) {
+            $("#barcode_" + checkMsg[i].code).JsBarcode(checkMsg[i].code, {
+                width: 2,
+                height: 100,
+                displayValue: true,
+            });
+        }
+    }
+</script>
+</html>
